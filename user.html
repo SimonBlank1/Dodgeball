@@ -86,7 +86,6 @@
       const board = document.getElementById("leaderboard");
       board.innerHTML = Object.entries(userData)
         .sort((a,b) => b[1].tokens - a[1].tokens)
-        .slice(0,10)
         .map(([name,data]) => `<li>${name}: ${data.tokens}</li>`)
         .join("");
     }

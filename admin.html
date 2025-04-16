@@ -1,0 +1,107 @@
+### admin.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | Dodgeball Sportsbook Arena</title>
+  <style>
+    body {
+      font-family: Comic Sans MS, sans-serif;
+      background-color: #ffe4e1;
+      text-align: center;
+      padding: 20px;
+    }
+    .box {
+      margin: 20px auto;
+      padding: 20px;
+      max-width: 600px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    }
+    input, select, button {
+      padding: 10px;
+      margin: 10px;
+      width: 80%;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+    button {
+      background-color: #32cd32;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Controls</h1>
+  <div class="box">
+    <input type="text" id="newTeam" placeholder="New Team Name">
+    <button onclick="addTeam()">Add Team</button><br>
+
+    <input type="text" id="newPlayer" placeholder="New Player Username">
+    <button onclick="addPlayer()">Add Player</button><br>
+
+    <input type="text" id="matchTeams" placeholder="Teams (e.g. Red Rockets vs Blue Blasters)">
+    <select id="matchType">
+      <option value="playin">Play-in Game</option>
+      <option value="championship">Championship Game</option>
+    </select>
+    <button onclick="createMatch()">Create Match</button>
+    <h4>Pending Matches:</h4>
+    <ul id="matchList"></ul>
+  </div>
+
+  <script>
+    let userData = {}, teamList = [], matchList = [];
+
+    function loadAll() {
+      userData = JSON.parse(localStorage.getItem("dodgeballUsers")) || {};
+      teamList = JSON.parse(localStorage.getItem("dodgeballTeams")) || [];
+      matchList = JSON.parse(localStorage.getItem("dodgeballMatches")) || [];
+      renderMatchList();
+    }
+
+    function saveAll() {
+      localStorage.setItem("dodgeballUsers", JSON.stringify(userData));
+      localStorage.setItem("dodgeballTeams", JSON.stringify(teamList));
+      localStorage.setItem("dodgeballMatches", JSON.stringify(matchList));
+    }
+
+    function addTeam() {
+      const team = document.getElementById("newTeam").value.trim();
+      if (!team) return;
+      teamList.push(team);
+      saveAll();
+      alert(`Team ${team} added.`);
+    }
+
+    function addPlayer() {
+      const player = document.getElementById("newPlayer").value.trim();
+      if (!player) return;
+      userData[player] = userData[player] || { tokens: 10, bets: [] };
+      saveAll();
+      alert(`Player ${player} added.`);
+    }
+
+    function createMatch() {
+      const teams = document.getElementById("matchTeams").value.trim();
+      const type = document.getElementById("matchType").value;
+      const [teamA, teamB] = teams.split(" vs ");
+      if (!teamA || !teamB) return alert("Format must be 'Team A vs Team B'");
+      matchList.push({ teams, type, teamA, teamB, bets: [] });
+      saveAll();
+      renderMatchList();
+    }
+
+    function renderMatchList() {
+      const ul = document.getElementById("matchList");
+      ul.innerHTML = matchList.map(m => `<li>${m.teams} (${m.type})</li>`).join("");
+    }
+
+    window.onload = loadAll;
+  </script>
+</body>
+</html>

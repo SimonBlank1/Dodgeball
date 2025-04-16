@@ -1,0 +1,98 @@
+### user.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Betting | Dodgeball Sportsbook Arena</title>
+  <style>
+    body {
+      font-family: Comic Sans MS, sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+    }
+    .box {
+      margin: 20px auto;
+      padding: 20px;
+      max-width: 500px;
+      background: #fff8dc;
+      border-radius: 15px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    }
+    button, input {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+    button {
+      background-color: #32cd32;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    #leaderboard li {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏐 Place Your Bets 🏐</h1>
+  <div class="box">
+    <p>Welcome <strong id="currentUser"></strong>!</p>
+    <p>Tokens: <strong id="tokenCount"></strong></p>
+    <h3>Pick the Winning Team</h3>
+    <div id="teamButtons"></div>
+  </div>
+  <div class="box">
+    <h3>🏆 Leaderboard</h3>
+    <ol id="leaderboard"></ol>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get("username");
+    let userData = JSON.parse(localStorage.getItem("dodgeballUsers")) || {};
+    let matchList = JSON.parse(localStorage.getItem("dodgeballMatches")) || [];
+
+    document.getElementById("currentUser").innerText = username;
+    document.getElementById("tokenCount").innerText = userData[username]?.tokens || 0;
+
+    function renderButtons() {
+      const container = document.getElementById("teamButtons");
+      matchList.forEach(match => {
+        const btn = document.createElement("button");
+        btn.innerText = `${match.teams} (${match.type})`;
+        btn.onclick = () => placeBet(match);
+        container.appendChild(btn);
+      });
+    }
+
+    function placeBet(match) {
+      const guess = prompt(`Who will win? (${match.teamA} or ${match.teamB})`);
+      if (![match.teamA, match.teamB].includes(guess)) return alert("Invalid team");
+      const bets = userData[username].bets || [];
+      if (bets.some(b => b.match === match.teams)) return alert("Already bet");
+      userData[username].tokens -= 1;
+      bets.push({ match: match.teams, predictedWinner: guess });
+      userData[username].bets = bets;
+      localStorage.setItem("dodgeballUsers", JSON.stringify(userData));
+      document.getElementById("tokenCount").innerText = userData[username].tokens;
+      alert(`You bet on ${guess}`);
+      updateLeaderboard();
+    }
+
+    function updateLeaderboard() {
+      const board = document.getElementById("leaderboard");
+      board.innerHTML = Object.entries(userData)
+        .sort((a,b) => b[1].tokens - a[1].tokens)
+        .slice(0,10)
+        .map(([name,data]) => `<li>${name}: ${data.tokens}</li>`)
+        .join("");
+    }
+
+    renderButtons();
+    updateLeaderboard();
+  </script>
+</body>
+</html>

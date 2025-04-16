@@ -1,329 +1,69 @@
+### index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dodgeball Sportsbook Arena</title>
+  <title>Login | Dodgeball Sportsbook Arena</title>
   <style>
     body {
       font-family: Comic Sans MS, sans-serif;
       background-color: #f0f8ff;
-      color: #333;
       text-align: center;
       padding: 20px;
     }
-
-    h1 {
-      color: #ff4500;
-    }
-
     .box {
       margin: 20px auto;
       padding: 20px;
-      max-width: 500px;
+      max-width: 400px;
       background: #fff8dc;
       border-radius: 15px;
       box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
     }
-
-    button {
-      padding: 10px 20px;
+    input, button {
       margin: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      background-color: #32cd32;
-      color: white;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #228b22;
-    }
-
-    input {
       padding: 10px;
-      margin-top: 10px;
       width: 80%;
       font-size: 16px;
       border-radius: 10px;
-      border: 1px solid #ccc;
     }
-
-    .token-count {
-      font-size: 18px;
-      font-weight: bold;
+    button {
+      background-color: #32cd32;
+      border: none;
+      color: white;
+      cursor: pointer;
     }
-
-    #leaderboard {
-      text-align: left;
-      margin-top: 10px;
-    }
-
-    #leaderboard li {
-      padding: 5px 0;
-    }
-
-    .admin-section {
-      background-color: #ffe4e1;
+    button:hover {
+      background-color: #228b22;
     }
   </style>
 </head>
 <body>
-
   <h1>🏐 Dodgeball Sportsbook Arena 🏐</h1>
-
-  <!-- Login Box -->
-  <div class="box" id="loginBox">
-    <h2>Enter Your Username</h2>
-    <input type="text" id="usernameInput" placeholder="Username" />
-    <br>
-    <button onclick="login()">Start Playing</button>
+  <div class="box">
+    <h2>Username Login</h2>
+    <input type="text" id="usernameInput" placeholder="Username">
+    <button onclick="userLogin()">Login as User</button>
   </div>
-
-  <!-- Game Box -->
-  <div class="box" id="gameBox" style="display:none;">
-    <p>Welcome, <strong id="currentUser"></strong>!</p>
-    <p class="token-count">Tokens: <span id="tokenCount">0</span></p>
-
-    <h3>Pick the Winning Team!</h3>
-    <p>Spend 1 token to predict a winner:</p>
-    <div id="teamButtons"></div>
-  </div>
-
-  <!-- Match Results -->
-  <div class="box" id="resultsBox" style="display:none;">
-    <h2>Results Are In!</h2>
-    <p id="matchResult"></p>
-    <button onclick="resetGame()">Play Again</button>
-  </div>
-
-  <!-- Leaderboard -->
-  <div class="box" id="leaderboardBox" style="display:none;">
-    <h3>🏆 Leaderboard</h3>
-    <ol id="leaderboard"></ol>
-  </div>
-
-  <!-- Admin Login -->
-  <div class="box admin-section" id="adminLoginBox">
-    <h2>🔒 Admin Panel</h2>
-    <input type="password" id="adminPassword" placeholder="Enter Admin Password" />
-    <br>
+  <div class="box">
+    <h2>Admin Panel</h2>
+    <input type="password" id="adminPassword" placeholder="Admin Password">
     <button onclick="adminLogin()">Login as Admin</button>
   </div>
 
-  <!-- Admin Controls -->
-  <div class="box admin-section" id="adminControls" style="display:none;">
-    <h3>Manage Matches & Players</h3>
-    <input type="text" id="newTeam" placeholder="New Team Name" />
-    <button onclick="addTeam()">Add Team</button><br><br>
-
-    <input type="text" id="newPlayer" placeholder="New Player Username" />
-    <button onclick="addPlayer()">Add Player</button><br><br>
-
-    <input type="text" id="matchTeams" placeholder="Teams (e.g. Red Rockets vs Blue Blasters)" />
-    <select id="matchType">
-      <option value="playin">Play-in Game</option>
-      <option value="championship">Championship Game</option>
-    </select>
-    <button onclick="createMatch()">Create Match</button>
-    <br><br>
-    <h4>Pending Matches:</h4>
-    <ul id="matchList"></ul>
-  </div>
-
   <script>
-    const ADMIN_PASSWORD = "letmein"; // Change this for real deployment
-    let currentUser = "";
-    let userData = {};
-    let teamList = [];
-    let matchList = [];
-
-    function loadUserData() {
-      const data = localStorage.getItem("dodgeballUsers");
-      if (data) userData = JSON.parse(data);
-    }
-
-    function saveUserData() {
-      localStorage.setItem("dodgeballUsers", JSON.stringify(userData));
-    }
-
-    function loadTeams() {
-      const savedTeams = localStorage.getItem("dodgeballTeams");
-      if (savedTeams) teamList = JSON.parse(savedTeams);
-      if (teamList.length === 0) teamList = ["Red Rockets", "Blue Blasters"];
-    }
-
-    function saveTeams() {
-      localStorage.setItem("dodgeballTeams", JSON.stringify(teamList));
-    }
-
-    function loadMatches() {
-      const savedMatches = localStorage.getItem("dodgeballMatches");
-      if (savedMatches) matchList = JSON.parse(savedMatches);
-    }
-
-    function saveMatches() {
-      localStorage.setItem("dodgeballMatches", JSON.stringify(matchList));
-    }
-
-    function renderTeamButtons() {
-      const btnContainer = document.getElementById("teamButtons");
-      btnContainer.innerHTML = "";
-      matchList.forEach(match => {
-        const btn = document.createElement("button");
-        btn.innerText = match.teams + " (" + match.type + ")";
-        btn.onclick = () => makePrediction(match);
-        btnContainer.appendChild(btn);
-      });
-    }
-
-    function login() {
+    function userLogin() {
       const username = document.getElementById("usernameInput").value.trim();
-      if (username === "") {
-        alert("Please enter a username.");
-        return;
-      }
-
-      loadUserData();
-      loadTeams();
-      loadMatches();
-
-      if (!userData[username]) {
-        userData[username] = { tokens: 10, bets: [] };
-      }
-
-      currentUser = username;
-      updateTokens();
-      renderTeamButtons();
-      updateLeaderboard();
-
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("gameBox").style.display = "block";
-      document.getElementById("leaderboardBox").style.display = "block";
-      document.getElementById("currentUser").innerText = currentUser;
+      if (!username) return alert("Enter a username");
+      window.location.href = `user.html?username=${encodeURIComponent(username)}`;
     }
-
-    function updateTokens() {
-      document.getElementById("tokenCount").innerText = userData[currentUser].tokens;
-      saveUserData();
-    }
-
-    function makePrediction(match) {
-      if (userData[currentUser].tokens <= 0) {
-        alert("You're out of tokens!");
-        return;
-      }
-
-      if (userData[currentUser].bets.some(bet => bet.match === match.teams)) {
-        alert("You've already placed a bet on this match!");
-        return;
-      }
-
-      const bet = { match: match.teams, predictedWinner: prompt("Which team will win? (Enter exactly):") };
-
-      if (![match.teamA, match.teamB].includes(bet.predictedWinner)) {
-        alert("Invalid team name!");
-        return;
-      }
-
-      userData[currentUser].tokens -= 1;
-      userData[currentUser].bets.push(bet);
-      updateTokens();
-      alert(`You placed a bet on ${bet.predictedWinner} in the ${match.type} match!`);
-
-      saveUserData();
-    }
-
-    function resetGame() {
-      document.getElementById("resultsBox").style.display = "none";
-    }
-
-    function updateLeaderboard() {
-      const leaderboardList = document.getElementById("leaderboard");
-      leaderboardList.innerHTML = "";
-
-      const sortedUsers = Object.entries(userData).sort((a, b) => b[1].tokens - a[1].tokens);
-
-      for (const [name, data] of sortedUsers.slice(0, 10)) {
-        const li = document.createElement("li");
-        li.textContent = `${name}: ${data.tokens} tokens`;
-        leaderboardList.appendChild(li);
-      }
-    }
-
     function adminLogin() {
       const password = document.getElementById("adminPassword").value;
-      if (password === ADMIN_PASSWORD) {
-        document.getElementById("adminControls").style.display = "block";
-        document.getElementById("adminLoginBox").style.display = "none";
+      if (password === "letmein") {
+        window.location.href = "admin.html";
       } else {
-        alert("Incorrect admin password!");
+        alert("Incorrect password");
       }
-    }
-
-    function createMatch() {
-      const matchTeams = document.getElementById("matchTeams").value.trim();
-      const matchType = document.getElementById("matchType").value;
-      
-      if (!matchTeams) {
-        alert("Please enter the teams for the match.");
-        return;
-      }
-
-      const teams = matchTeams.split(" vs ");
-      if (teams.length !== 2) {
-        alert("Please enter the match in the format 'Team A vs Team B'");
-        return;
-      }
-
-      const [teamA, teamB] = teams;
-
-      matchList.push({
-        teams: matchTeams,
-        type: matchType,
-        teamA: teamA,
-        teamB: teamB,
-        bets: []
-      });
-
-      saveMatches();
-      renderTeamButtons();
-      alert(`Match "${matchTeams}" created as a ${matchType} game!`);
-    }
-
-    function addTeam() {
-      const newTeam = document.getElementById("newTeam").value.trim();
-      if (!newTeam) {
-        alert("Please enter a team name.");
-        return;
-      }
-      teamList.push(newTeam);
-      saveTeams();
-      alert(`Team "${newTeam}" added!`);
-      document.getElementById("newTeam").value = "";
-    }
-
-    function addPlayer() {
-      const newPlayer = document.getElementById("newPlayer").value.trim();
-      if (!newPlayer) {
-        alert("Please enter a player username.");
-        return;
-      }
-      if (!userData[newPlayer]) {
-        userData[newPlayer] = { tokens: 10, bets: [] };
-        saveUserData();
-        alert(`Player "${newPlayer}" added with 10 tokens.`);
-      } else {
-        alert("Player already exists.");
-      }
-      document.getElementById("newPlayer").value = "";
-    }
-
-    window.onload = () => {
-      loadUserData();
-      loadTeams();
-      loadMatches();
     }
   </script>
 </body>

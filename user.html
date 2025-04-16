@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Betting | Dodgeball Sportsbook Arena</title>
+  <title>User Guesses | Dodgeball Arena</title>
   <style>
     body {
       font-family: Comic Sans MS, sans-serif;
@@ -38,7 +38,7 @@
   </style>
 </head>
 <body>
-  <h1>🏐 Place Your Bets 🏐</h1>
+  <h1>Make Your Prediction</h1>
   <div class="box">
     <p>Welcome <strong id="currentUser"></strong>!</p>
     <p>Tokens: <strong id="tokenCount"></strong></p>
@@ -63,19 +63,19 @@
       matchList.forEach(match => {
         const btn = document.createElement("button");
         btn.innerText = `${match.teams} (${match.type})`;
-        btn.onclick = () => placeBet(match);
+        btn.onclick = () => placeGuess(match);
         container.appendChild(btn);
       });
     }
 
-    function placeBet(match) {
+    function placeGuess(match) {
       const guess = prompt(`Who will win? (${match.teamA} or ${match.teamB})`);
       if (![match.teamA, match.teamB].includes(guess)) return alert("Invalid team");
-      const bets = userData[username].bets || [];
-      if (bets.some(b => b.match === match.teams)) return alert("Already bet");
+      const userPredictions = userData[username].userPredictions || [];
+      if (userPredictions.some(b => b.match === match.teams)) return alert("Already guessed");
       userData[username].tokens -= 1;
-      bets.push({ match: match.teams, predictedWinner: guess });
-      userData[username].bets = bets;
+      userPredictions.push({ match: match.teams, predictedWinner: guess });
+      userData[username].userPredictions = userPredictions;
       localStorage.setItem("dodgeballUsers", JSON.stringify(userData));
       document.getElementById("tokenCount").innerText = userData[username].tokens;
       alert(`You bet on ${guess}`);

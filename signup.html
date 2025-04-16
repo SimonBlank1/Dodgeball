@@ -1,0 +1,67 @@
+
+### signup.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up | Dodgeball Sportsbook Arena</title>
+  <style>
+    body {
+      font-family: Comic Sans MS, sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+    }
+    .box {
+      margin: 20px auto;
+      padding: 20px;
+      max-width: 400px;
+      background: #fff8dc;
+      border-radius: 15px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      width: 80%;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+    button {
+      background-color: #32cd32;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #228b22;
+    }
+  </style>
+</head>
+<body>
+  <h1>Create Your Account</h1>
+  <div class="box">
+    <input type="text" id="newUsername" placeholder="Choose a Username">
+    <input type="password" id="newPassword" placeholder="Choose a Password">
+    <button onclick="registerUser()">Sign Up</button>
+  </div>
+
+  <script>
+    function registerUser() {
+      const username = document.getElementById("newUsername").value.trim();
+      const password = document.getElementById("newPassword").value;
+      if (!username || !password) return alert("Fill in both fields");
+
+      const userData = JSON.parse(localStorage.getItem("dodgeballUsers")) || {};
+      if (userData[username]) return alert("Username already taken");
+
+      userData[username] = { password, tokens: 10, bets: [] };
+      localStorage.setItem("dodgeballUsers", JSON.stringify(userData));
+
+      alert("Account created! You can now log in.");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
